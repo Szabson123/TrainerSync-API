@@ -1,0 +1,10 @@
+venv/
+Do Szymona/
+
+*.pyc
+__pycache__/
+
+.vscode/
+.idea/
+
+*.log
