@@ -6,9 +6,19 @@ class CustomUser(AbstractUser):
     is_manager = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     
+    
     def __str__(self):
         return self.username
 
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = ['email', 'phone_number', 'first_name', 'last_name']
 
     
+class SubUser(models.Model):
+    parent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    email = models.EmailField()
+    number = models.CharField(max_length=15)
+    
+    def __str__(self) -> str:
+        return f'Opiekun: {self.parent.get_full_name()} dziecko - {self.name} {self.last_name}'
