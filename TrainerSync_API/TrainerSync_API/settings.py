@@ -48,9 +48,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
+    # Downloaded 
     'rest_framework',
     
+    # My apps
     'base',
+    'rooms',
+    'users',
 ]
 
 ROOT_URLCONF = 'TrainerSync_API.urls'
