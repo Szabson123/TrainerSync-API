@@ -37,7 +37,7 @@ class SubUserViewSet(viewsets.ModelViewSet):
     def create_sub_user(self, request, pk=None):
         main_user = get_object_or_404(CustomUser, pk=pk)
         data = request.data
-        data['parent'] = main_user.id
+        data['parent'] = main_user.pk
         serializer = SubUserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
