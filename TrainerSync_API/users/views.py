@@ -10,6 +10,24 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerliazer
     
+    @action(detail=True, methods=['PATCH'])
+    def change_to_trainer(self, request, pk=None):
+        user = get_object_or_404(CustomUser, pk=pk)
+        if request.user.is_manager:
+            user.is_trainer = True
+            user.save()
+            return Response({'status': 'user promoted to trainer'}, status=status.HTTP_200_OK)
+        return Response({'error': 'somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['POST'])
+    def change_to_manager(self, request, pk=None):
+        user = get_object_or_404(CustomUser, pk=pk)
+        if request.user.is_superuser:
+            user.is_manager = True
+            user.save()
+            return Response({'status': 'User promoted to manager'}, status=status.HTTP_200_OK)
+        return Response({'error': 'somethink went wrong'}, status=status.HTTP_200_OK)
+
 
 class SubUserViewSet(viewsets.ModelViewSet):
     queryset = SubUser.objects.all()
