@@ -9,7 +9,7 @@ class GroupSerializer(serializers.ModelSerializer):
         
         
 class RoomSerializer(serializers.ModelSerializer):
-    groups_to_room = GroupSerializer(many=True, read_only=True, source='groups')
+    groups_to_room = GroupSerializer(many=True, read_only=True, source='groups_in_room')
     class Meta:
         model = Room
         fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room']
