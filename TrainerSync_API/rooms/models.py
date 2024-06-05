@@ -30,6 +30,6 @@ class InvitationCode(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=255)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='groups')
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
