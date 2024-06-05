@@ -7,10 +7,13 @@ class Room(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
     
     def generate_code(self):
         code = uuid.uuid4().hex[:6].upper()
-        InvitationCode.objects.create(room=self, code=code)
+        while InvitationCode.objects.filter(code=code).exists():
+            InvitationCode.objects.create(room=self, code=code)
         return code
     
     def __str__(self) -> str:
@@ -28,3 +31,5 @@ class InvitationCode(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=255)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
