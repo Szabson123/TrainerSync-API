@@ -26,7 +26,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.is_manager = True
             user.save()
             return Response({'status': 'User promoted to manager'}, status=status.HTTP_200_OK)
-        return Response({'error': 'somethink went wrong'}, status=status.HTTP_200_OK)
+        return Response({'error': 'somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubUserViewSet(viewsets.ModelViewSet):
