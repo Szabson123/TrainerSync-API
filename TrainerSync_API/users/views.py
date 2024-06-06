@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from .models import CustomUser, SubUser
-from .serializers import UserSerliazer, SubUserSerializer
+from .serializers import UserSerializer, SubUserSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
-    serializer_class = UserSerliazer
+    serializer_class = UserSerializer
     
     @action(detail=True, methods=['PATCH'])
     def change_to_trainer(self, request, pk=None):

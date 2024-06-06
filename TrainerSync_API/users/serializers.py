@@ -15,7 +15,7 @@ class SubUserSerializer(serializers.ModelSerializer):
         }
         
 
-class UserSerliazer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     sub_user = SubUserSerializer(many=True, read_only=True, source='subuser_set')
     
     class Meta:
