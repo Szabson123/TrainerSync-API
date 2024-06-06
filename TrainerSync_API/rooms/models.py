@@ -36,8 +36,8 @@ class Group(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='groups_in_room')
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField(CustomUser, related_name='users_in_group')
-    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_group')
+    users = models.ManyToManyField(CustomUser, related_name='users_in_group', blank=True)
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_group', blank=True)
     
     def __str__(self) -> str:
         return self.name
@@ -46,9 +46,9 @@ class Group(models.Model):
 class ActivityClass(models.Model):
     name = models.CharField(max_length=255)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='activity_class_in_room')
-    groups = models.ManyToManyField(Group, related_name='groups_in_activity_class')
-    users = models.ManyToManyField(CustomUser, related_name='users_in_activity_class')
-    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_activity_group')
+    groups = models.ManyToManyField(Group, related_name='groups_in_activity_class', blank=True)
+    users = models.ManyToManyField(CustomUser, related_name='users_in_activity_class', blank=True)
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_activity_group', blank=True)
     
     def __str__(self) -> str:
         return self.name
