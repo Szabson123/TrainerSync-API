@@ -11,6 +11,11 @@ class RoomViewSet(viewsets.ModelViewSet):
     serializer_class = RoomSerializer
     
     
-class GroupSerializer(viewsets.ModelViewSet):
+class GroupViewSets(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    
+
+class AtivityRoomViewSet(viewsets.ModelViewSet):
+    queryset = ActivityClass.objects.all()
+    serializer_class = ActivityClassSerializer

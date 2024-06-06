@@ -16,29 +16,27 @@ class RoomSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room']
         
         
-class ActivityRoomSerializer(serializers.ModelSerializer):
-    unique_users = serializers.SerializerMethodField()
+class ActivityClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityClass
-        fields = ['id', 'name', 'room', 'groups', 'unique_users']
+        fields = ['id', 'name', 'room', 'groups', 'users', 'subusers']
         
-    def get_unique_users(self, obj):
-        # users in activity class
-        users = set(obj.users.all())
-        subusers = set(obj.users.all())
+    # def get_unique_users(self, obj):
+    #     # users in activity class
+    #     users = set(obj.users.all())
+    #     subusers = set(obj.users.all())
         
-        # users in groups in activity_class
-        for group in obj.group.all():
-            users.update(group.users.all())
-            subusers.update(group.subusers.all())
+    #     # users in groups in activity_class
+    #     for group in obj.groups.all():
+    #         users.update(group.users.all())
+    #         subusers.update(group.subusers.all())
         
-        unique_users = list(users)
-        unique_subusers = list(subusers)
+    #     unique_users = list(users)
+    #     unique_subusers = list(subusers)
         
-        
-        return {
-            'users': UserSerializer(unique_users, many=True).data,
-            'subusers': SubUserSerializer(unique_subusers, many=True).data,
-        }
+    #     return {
+    #         'users': UserSerializer(unique_users, many=True).data,
+    #         'subusers': SubUserSerializer(unique_subusers, many=True).data,
+    #     }
         
 
