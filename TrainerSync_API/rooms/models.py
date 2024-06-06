@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import CustomUser
+from users.models import CustomUser, SubUser
 import uuid    
     
     
@@ -9,10 +9,13 @@ class Room(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
+    users = models.ManyToManyField(CustomUser, related_name='users_in_room')
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_room')
     
     def generate_code(self):
         code = uuid.uuid4().hex[:6].upper()
         while InvitationCode.objects.filter(code=code).exists():
+            code = uuid.uuid4().hex[:6].upper()
             InvitationCode.objects.create(room=self, code=code)
         return code
     
@@ -22,7 +25,7 @@ class Room(models.Model):
 
 class InvitationCode(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
+    code = models.CharField(max_length=6, unique=True)
     
     def __str__(self) -> str:
         return self.code 
@@ -33,6 +36,20 @@ class Group(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='groups_in_room')
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
+    users = models.ManyToManyField(CustomUser, related_name='users_in_group')
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_group')
     
     def __str__(self) -> str:
         return self.name
+    
+
+class ActivityClass(models.Model):
+    name = models.CharField(max_length=255)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='activity_class_in_room')
+    groups = models.ManyToManyField(Group, related_name='groups_in_activity_class')
+    users = models.ManyToManyField(CustomUser, related_name='users_in_activity_class')
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_activity_group')
+    
+    def __str__(self) -> str:
+        return self.name
+    
