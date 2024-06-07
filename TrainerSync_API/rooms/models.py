@@ -53,3 +53,7 @@ class ActivityClass(models.Model):
     def __str__(self) -> str:
         return self.name
     
+    
+class Statute(models.Model):
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='statute_owner')
+    description = models.TextField()
