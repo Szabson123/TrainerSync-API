@@ -36,3 +36,16 @@ class ActivityClassSerializer(serializers.ModelSerializer):
             'users': [{'first_name': user.first_name, 'last_name': user.last_name} for user in users_in_activity],
             'subusers': [{'first_name': subuser.name, 'last_name': subuser.last_name} for subuser in subusers_in_activity]
         }
+        
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'id']
+        
+
+class SimpleSubUserSerializer(serializers.ModelSerializer):
+    parent_name = serializers.CharField(source='parent.get_full_name', read_only=True)
+    class Meta:
+        model = SubUser
+        fields = ['parent_name', 'name', 'last_name', 'email', 'number', 'id']

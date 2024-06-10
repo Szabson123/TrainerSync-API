@@ -16,7 +16,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         user_id = request.data.get('user_id')
         user = get_object_or_404(CustomUser, pk=user_id)
         
-        if user in room.users.all() and room.owner == request.user:
+        if user in room.users.all():
             print(True)
             room.users.remove(user)
             room.trainers.add(user)
@@ -32,7 +32,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         user_id = request.data.get('user_id')
         user = get_object_or_404(CustomUser, pk=user_id)
         
-        if user in room.trainers.all() and room.owner == request.user:
+        if user in room.trainers.all():
             room.trainers.remove(user)
             room.users.add(user)
             room.save()
@@ -40,6 +40,23 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response({'status': 'Trainer removed'}, status=status.HTTP_200_OK)
         
         return Response({'status': 'Somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['GET'])
+    def users_trainers_subusers_list(self, request, pk=None):
+        room = self.get_object()
+        users = room.users.all()
+        subusers = room.subusers.all()
+        trainers = room.trainers.all()
+        
+        users_serializer = SimpleUserSerializer(users, many=True)
+        subusers_serializer = SimpleSubUserSerializer(subusers, many=True)
+        trainers_serializer = SimpleUserSerializer(trainers, many=True)
+        
+        return Response({
+            'trainers': trainers_serializer.data,
+            'users': users_serializer.data,
+            'subusers': subusers_serializer.data
+        }, status=status.HTTP_200_OK)
         
     
     
