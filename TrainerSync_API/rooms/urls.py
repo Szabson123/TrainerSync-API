@@ -8,6 +8,8 @@ router.register('rooms', RoomViewSet)
 router.register('groups', GroupViewSets)
 router.register('activity_class', AtivityRoomViewSet)
 router.register('statute', StatueViewset)
+router.register('statute_acceptances', StatueAcceprtanceViewset)
+
 
 urlpatterns = [
     path('', include(router.urls)),

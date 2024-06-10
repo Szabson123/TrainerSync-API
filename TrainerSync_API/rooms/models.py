@@ -59,3 +59,9 @@ class Statute(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_name')
     description = models.TextField()
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='statue_owner')
+    
+
+class StatuteAcceptance(models.Model):
+    statute = models.ForeignKey(Statute, on_delete=models.CASCADE, related_name='acceptances')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_acceptnace')
+    is_accepted = models.BooleanField(default=False)

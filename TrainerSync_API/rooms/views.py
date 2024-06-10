@@ -75,3 +75,8 @@ class AtivityRoomViewSet(viewsets.ModelViewSet):
 class StatueViewset(viewsets.ModelViewSet):
     queryset = Statute.objects.all()
     serializer_class = StatueSerializer
+    
+
+class StatueAcceprtanceViewset(viewsets.ModelViewSet):
+    queryset = StatuteAcceptance.objects.all()
+    serializer_class = StatueAcceptanceSerializer
