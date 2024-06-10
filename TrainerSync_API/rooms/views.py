@@ -32,6 +32,8 @@ class RoomViewSet(viewsets.ModelViewSet):
         user_id = request.data.get('user_id')
         user = get_object_or_404(CustomUser, pk=user_id)
         
+        # ADD if manager
+        
         if user in room.trainers.all():
             room.trainers.remove(user)
             room.users.add(user)
@@ -68,3 +70,8 @@ class GroupViewSets(viewsets.ModelViewSet):
 class AtivityRoomViewSet(viewsets.ModelViewSet):
     queryset = ActivityClass.objects.all()
     serializer_class = ActivityClassSerializer
+    
+
+class StatueViewset(viewsets.ModelViewSet):
+    queryset = Statute.objects.all()
+    serializer_class = StatueSerializer

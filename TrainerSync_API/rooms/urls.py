@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register('rooms', RoomViewSet)
 router.register('groups', GroupViewSets)
 router.register('activity_class', AtivityRoomViewSet)
+router.register('statute', StatueViewset)
 
 urlpatterns = [
     path('', include(router.urls)),

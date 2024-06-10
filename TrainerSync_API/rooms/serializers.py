@@ -49,3 +49,11 @@ class SimpleSubUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubUser
         fields = ['parent_name', 'name', 'last_name', 'email', 'number', 'id']
+        
+        
+class StatueSerializer(serializers.ModelSerializer):
+    room_name = serializers.CharField(source='room.name', read_only=True)
+    owner_name = serializers.CharField(source='owner.get_full_name', read_only=True)
+    class Meta:
+        model = Statute
+        fields = ['id', 'room_name', 'owner_name', 'description']

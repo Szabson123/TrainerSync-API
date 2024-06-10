@@ -56,5 +56,6 @@ class ActivityClass(models.Model):
     
     
 class Statute(models.Model):
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='statute_owner')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_name')
     description = models.TextField()
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='statue_owner')
