@@ -1,5 +1,6 @@
 from django.db import models
-
+from rooms.models import *
+from users.models import *
 
 
 class ActivityClass(models.Model):

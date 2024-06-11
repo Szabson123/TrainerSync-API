@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'base',
     'rooms',
     'users',
+    'activity_class',
 ]
 
 MIDDLEWARE = [

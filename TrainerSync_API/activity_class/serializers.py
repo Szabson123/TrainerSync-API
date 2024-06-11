@@ -1,4 +1,8 @@
-
+from rest_framework import serializers
+from .models import *
+from rooms.models import *
+from users.serializers import *
+from rooms.serializers import *
 
 
 class ActivityClassSerializer(serializers.ModelSerializer):
