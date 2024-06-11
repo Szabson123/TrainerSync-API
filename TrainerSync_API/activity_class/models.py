@@ -24,7 +24,7 @@ class BalanceForActivityClass(models.Model):
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     paid = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
-
+    
     def get_name(self):
         return self.activity_class.name if self.activity_class else "No Activity Class"
 

@@ -11,7 +11,7 @@ class ActivityClassSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ActivityClass
-        fields = ['id', 'name', 'room', 'groups', 'unique_users', 'groups']
+        fields = ['id', 'name', 'room', 'groups', 'unique_users', 'groups', 'time']
         
     def get_unique_users(self, obj):
         users_in_activity = set(obj.users.all())
@@ -26,3 +26,13 @@ class ActivityClassSerializer(serializers.ModelSerializer):
             'subusers': [{'first_name': subuser.name, 'last_name': subuser.last_name} for subuser in subusers_in_activity]
         }
         
+
+class BalanceForActivityClassSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    room_name = serializers.CharField(source='room.name', read_only=True)
+    
+    class Meta:
+        model = BalanceForActivityClass
+        fields = ['user_name', 'room_name', 'activity_class', 'amount_due', 'amount_paid', 'paid', 'date']
+        
+    
