@@ -79,9 +79,6 @@ class GroupViewSets(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     
 
-class AtivityRoomViewSet(viewsets.ModelViewSet):
-    queryset = ActivityClass.objects.all()
-    serializer_class = ActivityClassSerializer
     
 
 class StatueViewset(viewsets.ModelViewSet):
