@@ -10,6 +10,7 @@ class ActivityClass(models.Model):
     users = models.ManyToManyField(CustomUser, related_name='users_in_activity_class', blank=True)
     subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_activity_group', blank=True)
     cost = models.DecimalField(max_digits=6, decimal_places=2, null=True)
+    time = models.DurationField(null=True)
     
     def __str__(self) -> str:
         return self.name
