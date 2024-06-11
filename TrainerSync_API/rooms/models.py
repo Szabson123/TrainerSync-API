@@ -64,4 +64,4 @@ class Statute(models.Model):
 class StatuteAcceptance(models.Model):
     statute = models.ForeignKey(Statute, on_delete=models.CASCADE, related_name='acceptances')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_acceptnace')
-    is_accepted = models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(auto_now_add=True, null=True)

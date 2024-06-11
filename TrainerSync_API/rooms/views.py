@@ -80,3 +80,17 @@ class StatueViewset(viewsets.ModelViewSet):
 class StatueAcceprtanceViewset(viewsets.ModelViewSet):
     queryset = StatuteAcceptance.objects.all()
     serializer_class = StatueAcceptanceSerializer
+    
+    @action(detail=False, methods=['POST'])
+    def accept(self, request):
+        user = request.user
+        statute_id = request.data.get('statute_id')
+        statute = get_object_or_404(Statute, pk=statute_id)
+        
+        acceptance, created = StatuteAcceptance.objects.get_or_create(user=user, statute=statute)
+        
+        if created:
+            return Response({'status': 'Regulamin został zaakceptowany'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'status': 'Regulamin był już zaakceptowany'}, status=status.HTTP_200_OK)
+        

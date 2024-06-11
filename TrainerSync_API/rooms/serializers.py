@@ -65,4 +65,5 @@ class StatueAcceptanceSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     class Meta:
         model = StatuteAcceptance
-        fields = ['statute_name', 'user_name', 'is_accepted', 'statute_owner_name']
+        fields = ['id', 'statute_name', 'user_name', 'statute_owner_name', 'accepted_at']
+        read_only_fields=['accepted_at']
