@@ -2,6 +2,18 @@ from rest_framework import serializers
 from .models import *
 from users.serializers import *
 
+
+class InvitationCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvitationCode
+        fields = ['id', 'room', 'code']
+        
+
+class LittleInvitationCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvitationCode
+        fields = ['code']
+
     
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,9 +23,10 @@ class GroupSerializer(serializers.ModelSerializer):
         
 class RoomSerializer(serializers.ModelSerializer):
     groups_to_room = GroupSerializer(many=True, read_only=True, source='groups_in_room')
+    code = LittleInvitationCodeSerializer(read_only=True, source='invitation_code')
     class Meta:
         model = Room
-        fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room', 'trainers', 'users', 'subusers']
+        fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room', 'trainers', 'users', 'subusers', 'code']
         
         
 class ActivityClassSerializer(serializers.ModelSerializer):
@@ -67,3 +80,5 @@ class StatueAcceptanceSerializer(serializers.ModelSerializer):
         model = StatuteAcceptance
         fields = ['id', 'statute_name', 'user_name', 'statute_owner_name', 'accepted_at']
         read_only_fields=['accepted_at']
+        
+

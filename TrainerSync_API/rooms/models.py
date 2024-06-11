@@ -17,7 +17,6 @@ class Room(models.Model):
         code = uuid.uuid4().hex[:6].upper()
         while InvitationCode.objects.filter(code=code).exists():
             code = uuid.uuid4().hex[:6].upper()
-            InvitationCode.objects.create(room=self, code=code)
         return code
     
     def __str__(self) -> str:
@@ -25,7 +24,7 @@ class Room(models.Model):
     
 
 class InvitationCode(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.OneToOneField(Room, on_delete=models.CASCADE, related_name='invitation_code')
     code = models.CharField(max_length=6, unique=True)
     
     def __str__(self) -> str:

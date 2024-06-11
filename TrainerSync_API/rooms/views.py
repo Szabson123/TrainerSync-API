@@ -60,6 +60,18 @@ class RoomViewSet(viewsets.ModelViewSet):
             'subusers': subusers_serializer.data
         }, status=status.HTTP_200_OK)
         
+    @action(detail=True, methods=['post'])
+    def generate_code(self, request, pk=None):
+        room = self.get_object()
+        if hasattr(room, 'invitation_code'):
+            room.invitation_code.delete()
+        # Generowanie nowego kodu
+        new_code = room.generate_code()
+        invitation_code = InvitationCode.objects.create(room=room, code=new_code)
+        serializer = InvitationCodeSerializer(invitation_code)
+        return Response({'code': serializer.data}, status=status.HTTP_201_CREATED)
+
+        
     
     
 class GroupViewSets(viewsets.ModelViewSet):
