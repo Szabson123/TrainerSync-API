@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import *
 from .serializers import *
 from rest_framework import viewsets, status
@@ -58,6 +58,18 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
                 result.append(sub_user_data)
 
         return Response(result, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['POST'])    
+    def payment_accepted_by_trainer_manager(self, request, pk=None):
+        activity_class = self.get_object()
+        balance_user = get_object_or_404(BalanceForActivityClass, pk=activity_class)
+        
+        if not balance_user.paid:
+            balance_user.paid == True
+            balance_user.save()
+            return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
+        
+        return Response({'error': 'somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+        
         
 
 class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
