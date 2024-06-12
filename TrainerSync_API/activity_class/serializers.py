@@ -34,9 +34,12 @@ class ActivityClassSerializer(serializers.ModelSerializer):
         groups_data = validated_data.pop('groups', [])
         activity_class = ActivityClass.objects.create(**validated_data)
 
-        activity_class.users.set(users_data)
-        activity_class.subusers.set(subusers_data)
-        activity_class.groups.set(groups_data)
+        if users_data:
+            activity_class.users.set(users_data)
+        if subusers_data:
+            activity_class.subusers.set(subusers_data)
+        if groups_data:
+            activity_class.groups.set(groups_data)
         
         activity_class.save()
         activity_class.create_balances()

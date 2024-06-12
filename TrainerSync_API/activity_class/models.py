@@ -48,18 +48,20 @@ class ActivityClass(models.Model):
 
         for subuser in subusers_in_activity:
             BalanceForActivityClass.objects.get_or_create(
-                user=subuser,
+                subuser=subuser,
                 room=self.room,
                 activity_class=self,
                 defaults={'amount_due': self.cost}
             )
 
 
+
     def __str__(self) -> str:
         return self.name
 
 class BalanceForActivityClass(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_user')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_user', null=True, blank=True)
+    subuser = models.ForeignKey(SubUser, on_delete=models.CASCADE, related_name='balance_subuser', null=True, blank=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_in_balance')
     activity_class = models.ForeignKey(ActivityClass, on_delete=models.SET_NULL, null=True, related_name='activity_in_balance')
     amount_due = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -71,4 +73,4 @@ class BalanceForActivityClass(models.Model):
         return self.activity_class.name if self.activity_class else "No Activity Class"
 
     def __str__(self):
-        return f'{self.user} -- {self.get_name()}'
+        return f'{self.user or self.subuser} -- {self.get_name()}'
