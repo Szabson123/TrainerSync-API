@@ -39,27 +39,30 @@ class ActivityClass(models.Model):
             subusers_in_activity.update(group.subusers.all())
 
         for user in users_in_activity:
-            BalanceForActivityClass.objects.create(
+            BalanceForActivityClass.objects.get_or_create(
                 user=user,
                 room=self.room,
                 activity_class=self,
-                amount_due=self.cost
+                defaults={'amount_due': self.cost}
             )
 
         for subuser in subusers_in_activity:
-            BalanceForActivityClass.objects.create(
+            BalanceForActivityClass.objects.get_or_create(
                 user=subuser,
                 room=self.room,
                 activity_class=self,
-                amount_due=self.cost
+                defaults={'amount_due': self.cost}
             )
 
+
+    def __str__(self) -> str:
+        return self.name
 
 class BalanceForActivityClass(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_user')
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_in_balance')
     activity_class = models.ForeignKey(ActivityClass, on_delete=models.SET_NULL, null=True, related_name='activity_in_balance')
-    amount_due = models.ForeignKey(ActivityClass, on_delete=models.SET_NULL, null=True, related_name='user_have_to_pay')
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     paid = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)

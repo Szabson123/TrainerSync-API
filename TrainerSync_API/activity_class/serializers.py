@@ -7,11 +7,13 @@ from rooms.serializers import *
 
 class ActivityClassSerializer(serializers.ModelSerializer):
     unique_users = serializers.SerializerMethodField()
-    groups = GroupSerializer(many=True, read_only=True)
+    groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True, required=False)
+    users = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), many=True, required=False)
+    subusers = serializers.PrimaryKeyRelatedField(queryset=SubUser.objects.all(), many=True, required=False)
 
     class Meta:
         model = ActivityClass
-        fields = ['id', 'name', 'room', 'groups', 'unique_users', 'users', 'subusers', 'time']
+        fields = ['id', 'name', 'room', 'groups', 'unique_users', 'users', 'subusers', 'time', 'cost', 'start_date', 'end_date']
 
     def get_unique_users(self, obj):
         users_in_activity = set(obj.users.all())
@@ -32,16 +34,13 @@ class ActivityClassSerializer(serializers.ModelSerializer):
         groups_data = validated_data.pop('groups', [])
         activity_class = ActivityClass.objects.create(**validated_data)
 
-        for user_data in users_data:
-            activity_class.users.add(user_data)
-
-        for subuser_data in subusers_data:
-            activity_class.subusers.add(subuser_data)
-
-        for group_data in groups_data:
-            activity_class.groups.add(group_data)
-
+        activity_class.users.set(users_data)
+        activity_class.subusers.set(subusers_data)
+        activity_class.groups.set(groups_data)
+        
         activity_class.save()
+        activity_class.create_balances()
+        
         return activity_class
 
         
