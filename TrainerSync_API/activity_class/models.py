@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from rooms.models import *
 from users.models import *
 from django.utils.translation import gettext_lazy as _
@@ -21,15 +21,38 @@ class ActivityClass(models.Model):
             raise ValidationError(_('End date cannot be earlier than start date'))
     
     def save(self, *args, **kwargs):
-        if self.time and not self.end_date:
-            self.end_date = self.start_date + self.time
-        elif not self.time and self.end_date:
-            self.time = self.end_date - self.start_date
-        self.clean()
-        super().save(*args, **kwargs)
-    
-    def __str__(self) -> str:
-        return self.name
+        with transaction.atomic():
+            if self.time and not self.end_date:
+                self.end_date = self.start_date + self.time
+            elif not self.time and self.end_date:
+                self.time = self.end_date - self.start_date
+            self.clean()
+            super().save(*args, **kwargs)
+            self.create_balances()
+
+    def create_balances(self):
+        users_in_activity = set(self.users.all())
+        subusers_in_activity = set(self.subusers.all())
+
+        for group in self.groups.all():
+            users_in_activity.update(group.users.all())
+            subusers_in_activity.update(group.subusers.all())
+
+        for user in users_in_activity:
+            BalanceForActivityClass.objects.create(
+                user=user,
+                room=self.room,
+                activity_class=self,
+                amount_due=self.cost
+            )
+
+        for subuser in subusers_in_activity:
+            BalanceForActivityClass.objects.create(
+                user=subuser,
+                room=self.room,
+                activity_class=self,
+                amount_due=self.cost
+            )
 
 
 class BalanceForActivityClass(models.Model):

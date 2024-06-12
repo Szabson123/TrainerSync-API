@@ -5,7 +5,7 @@ from .views import *
 
 router = DefaultRouter()
 
-router.register('activity_class', AtivityRoomViewSet)
+router.register('activity_class', ActivityClassViewSet)
 router.register('balance_per_user', BalanceForActivityClassViewSet)
 
 urlpatterns = [
