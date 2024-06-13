@@ -4,7 +4,7 @@ from .serializers import *
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-
+from django.db.models import Q
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
@@ -58,19 +58,31 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
                 result.append(sub_user_data)
 
         return Response(result, status=status.HTTP_200_OK)
-    @action(detail=True, methods=['POST'])    
+    
+    @action(detail=True, methods=['POST'])
     def payment_accepted_by_trainer_manager(self, request, pk=None):
         activity_class = self.get_object()
-        balance_user = get_object_or_404(BalanceForActivityClass, pk=activity_class)
+        user_id = request.data.get('user_id')
         
-        if not balance_user.paid:
-            balance_user.paid == True
-            balance_user.save()
-            return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
-        
-        return Response({'error': 'somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find the balance for the given user and activity class
+        balance_user = BalanceForActivityClass.objects.filter(
+            activity_class=activity_class,
+            user_id=user_id,
+            paid=False
+        ).first()
+
+        if not balance_user:
+            return Response({'error': 'No unpaid balance found for the specified user'}, status=status.HTTP_404_NOT_FOUND)
+
+        balance_user.paid = True
+        balance_user.amount_paid = balance_user.amount_due
+        balance_user.save()
+
+        return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
+       
 
 class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
     queryset = BalanceForActivityClass.objects.all()
