@@ -70,9 +70,24 @@ class RoomViewSet(viewsets.ModelViewSet):
         invitation_code = InvitationCode.objects.create(room=room, code=new_code)
         serializer = InvitationCodeSerializer(invitation_code)
         return Response({'code': serializer.data}, status=status.HTTP_201_CREATED)
-
-        
     
+    @action(detail=False, methods=['POST'])
+    def use_code_to_join_room(self, request, pk=None):  
+        code = request.data.get('code')
+        user = self.request.user
+        if not code:
+            return Response({'error': 'Code is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        invitation_code = get_object_or_404(InvitationCode, code=code)
+        room = invitation_code.room
+
+        if user in room.users.all() or user in room.trainers.all():
+            return Response({'error': 'User is already in the room'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        room.users.add(user)
+        room.save()
+
+        return Response({'status': 'User added to the room'}, status=status.HTTP_200_OK)
     
 class GroupViewSets(viewsets.ModelViewSet):
     queryset = Group.objects.all()
