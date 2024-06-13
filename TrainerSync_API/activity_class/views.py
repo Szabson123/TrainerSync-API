@@ -59,6 +59,25 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
 
         return Response(result, status=status.HTTP_200_OK)
     
+    @action(detail=False, methods=['GET'])
+    def history_of_user_peyments(self, request, pk=None):
+        user_id = request.data.get('user_id')
+        balance_user = BalanceForActivityClass.objects.filter(user_id=user_id)
+        
+        result = []
+        
+        for balance in balance_user:
+            user_data = {
+                'activity_class': balance.activity_class.name,
+                'paid': balance.paid,
+                'amount_due': balance.amount_due,
+                'amount_paid': balance.amount_paid,
+                'data': balance.date
+            }
+            result.append(user_data)
+        return Response(result, status=status.HTTP_200_OK)
+        
+    
     @action(detail=True, methods=['POST'])
     def payment_accepted_by_trainer_manager(self, request, pk=None):
         activity_class = self.get_object()
