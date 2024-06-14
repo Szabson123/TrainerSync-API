@@ -94,8 +94,6 @@ class GroupViewSets(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     
 
-    
-
 class StatueViewset(viewsets.ModelViewSet):
     queryset = Statute.objects.all()
     serializer_class = StatueSerializer

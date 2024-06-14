@@ -1,9 +1,11 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from .models import CustomUser, SubUser
 from .serializers import UserSerializer, SubUserSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -42,4 +44,19 @@ class SubUserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserRegistrationView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'user': UserSerializer(user).data
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
