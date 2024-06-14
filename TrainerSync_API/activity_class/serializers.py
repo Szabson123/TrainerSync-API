@@ -56,10 +56,11 @@ class ActivityClassSerializer(serializers.ModelSerializer):
 class BalanceForActivityClassSerializer(serializers.ModelSerializer):
     user_name = serializers.SerializerMethodField()
     room_name = serializers.CharField(source='room.name', read_only=True)
+    activity_class_name = serializers.CharField(source='activity_class.name', read_only=True)
     
     class Meta:
         model = BalanceForActivityClass
-        fields = ['user_name', 'room_name', 'activity_class', 'amount_due', 'amount_paid', 'paid', 'date']
+        fields = ['user_name', 'room_name', 'activity_class', 'activity_class_name', 'amount_due', 'amount_paid', 'paid', 'date']
     
     def get_user_name(self, obj):
         if obj.user is not None:

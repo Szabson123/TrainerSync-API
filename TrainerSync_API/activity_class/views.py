@@ -129,5 +129,9 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
        
 
 class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
-    queryset = BalanceForActivityClass.objects.all()
+    queryset = BalanceForActivityClass.objects.none()
     serializer_class = BalanceForActivityClassSerializer
+    
+    def get_queryset(self):
+        room_id = self.kwargs['room_pk']
+        return BalanceForActivityClass.objects.filter(room_id=room_id)
