@@ -7,13 +7,14 @@ from rooms.serializers import *
 
 class ActivityClassSerializer(serializers.ModelSerializer):
     unique_users = serializers.SerializerMethodField()
-    groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True, required=False)
-    users = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), many=True, required=False)
-    subusers = serializers.PrimaryKeyRelatedField(queryset=SubUser.objects.all(), many=True, required=False)
+    groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True, required=False, write_only=True)
+    users = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), many=True, required=False, write_only=True)
+    subusers = serializers.PrimaryKeyRelatedField(queryset=SubUser.objects.all(), many=True, required=False, write_only=True)
+    groups_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ActivityClass
-        fields = ['id', 'name', 'groups', 'unique_users', 'users', 'subusers', 'cost', 'start_date', 'end_date']
+        fields = ['id', 'name', 'groups', 'groups_name', 'unique_users', 'users', 'subusers', 'cost', 'start_date', 'end_date']
 
     def get_unique_users(self, obj):
         users_in_activity = set(obj.users.all())
@@ -28,6 +29,10 @@ class ActivityClassSerializer(serializers.ModelSerializer):
             'subusers': [{'first_name': subuser.name, 'last_name': subuser.last_name} for subuser in subusers_in_activity]
         }
 
+    def get_groups_name(self, obj):
+        return [group.name for group in obj.groups.all()]
+    
+    
     def create(self, validated_data):
         users_data = validated_data.pop('users', [])
         subusers_data = validated_data.pop('subusers', [])
@@ -45,6 +50,7 @@ class ActivityClassSerializer(serializers.ModelSerializer):
         activity_class.create_balances()
         
         return activity_class
+
 
 
 class BalanceForActivityClassSerializer(serializers.ModelSerializer):
