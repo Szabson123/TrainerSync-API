@@ -8,18 +8,22 @@ from django.db.models import Q
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
-    queryset = ActivityClass.objects.all()
+    queryset = ActivityClass.objects.none()  # Dodaj to, aby uniknąć błędu
     serializer_class = ActivityClassSerializer
+    
+    def get_queryset(self):
+        room_id = self.kwargs['room_pk']
+        return ActivityClass.objects.filter(room_id=room_id)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        room_id = self.kwargs.get('room_pk')
+        request.data['room'] = room_id
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        instance = serializer.save()
+        room_id = self.kwargs.get('room_pk')
+        room = get_object_or_404(Room, pk=room_id)
+        instance = serializer.save(room=room)
         instance.create_balances()
         return instance
 
@@ -121,6 +125,7 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         balance_user.save()
 
         return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
+
        
 
 class BalanceForActivityClassViewSet(viewsets.ModelViewSet):

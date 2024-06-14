@@ -54,10 +54,9 @@ class ActivityClass(models.Model):
                 defaults={'amount_due': self.cost}
             )
 
-
-
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
+
 
 class BalanceForActivityClass(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_user', null=True, blank=True)
