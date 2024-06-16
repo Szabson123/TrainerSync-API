@@ -33,19 +33,20 @@ class UserViewSet(viewsets.ModelViewSet):
     
 
 class SubUserViewSet(viewsets.ModelViewSet):
-    queryset = SubUser.objects.all()
     serializer_class = SubUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        parent_id = self.kwargs['parent_pk']
+        return SubUser.objects.filter(parent_id=parent_id)
     
-    @action(detail=True, methods=['POST'])
-    def create_sub_user(self, request, pk=None):
-        main_user = get_object_or_404(CustomUser, pk=pk)
-        if not request.user.is_authenticated:
-            return Response({'detail': 'Authentication credentials were not provided'}, status=status.HTTP_401_UNAUTHORIZED)
+    def create(self, request, parent_pk=None):
+        main_user = get_object_or_404(CustomUser, pk=parent_pk)
         
         data = request.data
         data['parent'] = main_user.pk
-        serializer = SubUserSerializer(data=data)
-        
+        serializer = self.get_serializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -8,7 +8,7 @@ from django.db.models import Q
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
-    queryset = ActivityClass.objects.none()  # Dodaj to, aby uniknąć błędu
+    queryset = ActivityClass.objects.none()
     serializer_class = ActivityClassSerializer
     
     def get_queryset(self):

@@ -5,7 +5,8 @@ from .views import *
 
 router = DefaultRouter()
 router.register('users', UserViewSet)
-router.register('subusers', SubUserViewSet)
+router.register('users/(?P<parent_pk>\d+)/subusers', SubUserViewSet, basename='subuser')
+
 
 urlpatterns = [
     path('', include(router.urls)),
