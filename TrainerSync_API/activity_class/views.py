@@ -20,7 +20,7 @@ class IsRoomOwner(permissions.BasePermission):
 class ActivityClassViewSet(viewsets.ModelViewSet):
     queryset = ActivityClass.objects.none()
     serializer_class = ActivityClassSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsRoomOwner]
     
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
