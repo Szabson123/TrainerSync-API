@@ -3,6 +3,12 @@ from .models import *
 from users.serializers import *
 
 
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'first_name', 'last_name']
+
+
 class InvitationCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvitationCode
@@ -24,6 +30,10 @@ class GroupSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     groups_to_room = GroupSerializer(many=True, read_only=True, source='groups_in_room')
     code = LittleInvitationCodeSerializer(read_only=True, source='invitation_code')
+    trainers = SimpleUserSerializer(many=True, read_only=True)
+    users = SimpleUserSerializer(many=True, read_only=True)
+    subusers = SimpleUserSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Room
         fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room', 'trainers', 'users', 'subusers', 'code']
@@ -60,3 +70,7 @@ class StatueAcceptanceSerializer(serializers.ModelSerializer):
         read_only_fields=['accepted_at']
         
 
+class RoomCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['name']

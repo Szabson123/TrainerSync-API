@@ -4,12 +4,26 @@ from .serializers import *
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
+
+class IsOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if view.action == 'create':
+            room_id = view.kwargs.get('room_pk')
+            room = get_object_or_404(Room, pk=room_id)
+            return room.owner == request.user
+        return True
 
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
-    serializer_class = RoomSerializer
-    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RoomCreateSerializer
+        return RoomSerializer
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
     
@@ -20,14 +34,12 @@ class RoomViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(CustomUser, pk=user_id)
         
         if user in room.users.all():
-            print(True)
             room.users.remove(user)
             room.trainers.add(user)
             room.save()
-
-            return Response({'status': 'User upgradeed to trainer'}, status=status.HTTP_200_OK)
+            return Response({'status': 'User upgraded to trainer'}, status=status.HTTP_200_OK)
         
-        return Response({'status': 'Somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['POST'])
     def remove_trainer(self, request, pk=None):
@@ -35,16 +47,16 @@ class RoomViewSet(viewsets.ModelViewSet):
         user_id = request.data.get('user_id')
         user = get_object_or_404(CustomUser, pk=user_id)
         
-        # ADD if manager
+        if room.owner != request.user:
+            return Response('You are not the owner of this room', status=status.HTTP_403_FORBIDDEN)
         
         if user in room.trainers.all():
             room.trainers.remove(user)
             room.users.add(user)
             room.save()
-            
             return Response({'status': 'Trainer removed'}, status=status.HTTP_200_OK)
         
-        return Response({'status': 'Somethink went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['GET'])
     def users_trainers_subusers_list(self, request, pk=None):
@@ -63,19 +75,18 @@ class RoomViewSet(viewsets.ModelViewSet):
             'subusers': subusers_serializer.data
         }, status=status.HTTP_200_OK)
         
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['POST'])
     def generate_code(self, request, pk=None):
         room = self.get_object()
         if hasattr(room, 'invitation_code'):
             room.invitation_code.delete()
-        # Generowanie nowego kodu
         new_code = room.generate_code()
         invitation_code = InvitationCode.objects.create(room=room, code=new_code)
         serializer = InvitationCodeSerializer(invitation_code)
         return Response({'code': serializer.data}, status=status.HTTP_201_CREATED)
     
     @action(detail=False, methods=['POST'])
-    def use_code_to_join_room(self, request, pk=None):  
+    def use_code_to_join_room(self, request):
         code = request.data.get('code')
         user = self.request.user
         if not code:
@@ -91,11 +102,13 @@ class RoomViewSet(viewsets.ModelViewSet):
         room.save()
 
         return Response({'status': 'User added to the room'}, status=status.HTTP_200_OK)
+
+
     
     
 class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
@@ -104,6 +117,10 @@ class GroupViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         room_id = self.kwargs['room_pk']
         room = get_object_or_404(Room, pk=room_id)
+
+        if room.owner != self.request.user:
+            raise PermissionDenied("You do not have permission to add groups to this room.")
+        
         serializer.save(room=room)
     
 
