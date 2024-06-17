@@ -1,15 +1,26 @@
 from django.shortcuts import render, get_object_or_404
 from .models import *
 from .serializers import *
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
+
+
+class IsRoomOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if view.action in ['create', 'perform_create']:
+            room_id = view.kwargs.get('room_pk')
+            room = Room.objects.get(pk=room_id)
+            return room.owner == request.user
+        return True
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
     queryset = ActivityClass.objects.none()
     serializer_class = ActivityClassSerializer
+    permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
@@ -23,6 +34,10 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         room_id = self.kwargs.get('room_pk')
         room = get_object_or_404(Room, pk=room_id)
+        
+        if room.owner != self.request.user:
+            raise PermissionDenied("You do not have permission to add activity classes to this room.")
+        
         instance = serializer.save(room=room)
         instance.create_balances()
         return instance
