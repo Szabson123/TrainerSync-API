@@ -5,10 +5,9 @@ from .views import *
 
 router = DefaultRouter()
 router.register('rooms', RoomViewSet)
-router.register('groups', GroupViewSets)
+router.register('rooms/(?P<room_pk>\d+)/groups', GroupViewSet, basename='group')
 router.register('statute', StatueViewset)
 router.register('statute_acceptances', StatueAcceprtanceViewset)
-
 
 
 urlpatterns = [

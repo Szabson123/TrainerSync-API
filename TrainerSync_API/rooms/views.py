@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import *
 from .serializers import *
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -9,6 +9,9 @@ from rest_framework.response import Response
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
     
     @action(detail=True, methods=['POST'])
     def upgrade_to_trainer(self, request, pk=None):
@@ -89,9 +92,19 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         return Response({'status': 'User added to the room'}, status=status.HTTP_200_OK)
     
-class GroupViewSets(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
+    
+class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        room_id = self.kwargs['room_pk']
+        return Group.objects.filter(room_id=room_id)
+
+    def perform_create(self, serializer):
+        room_id = self.kwargs['room_pk']
+        room = get_object_or_404(Room, pk=room_id)
+        serializer.save(room=room)
     
 
 class StatueViewset(viewsets.ModelViewSet):
