@@ -73,4 +73,4 @@ class StatueAcceptanceSerializer(serializers.ModelSerializer):
 class RoomCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['name']
+        fields = ['name', 'description']

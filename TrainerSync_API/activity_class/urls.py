@@ -5,8 +5,8 @@ from .views import *
 
 router = DefaultRouter()
 
-router.register('rooms/(?P<room_pk>\d+)/activities', ActivityClassViewSet)
-router.register('rooms/(?P<room_pk>\d+)/balance_for_activity', BalanceForActivityClassViewSet)
+router.register('(?P<room_pk>\d+)/activities', ActivityClassViewSet)
+router.register('(?P<room_pk>\d+)/balance_for_activity', BalanceForActivityClassViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
