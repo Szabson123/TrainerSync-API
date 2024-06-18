@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     
     # My apps
+    'custom_auth',
     'base',
     'rooms',
     'users',

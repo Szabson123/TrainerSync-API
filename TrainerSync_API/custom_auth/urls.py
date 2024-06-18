@@ -1,10 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, SubUserViewSet
+from .views import RegistrationViewSet
 
 router = DefaultRouter()
-router.register('', UserViewSet)
-router.register('(?P<parent_pk>\d+)/subusers', SubUserViewSet, basename='subuser')
+router.register('', RegistrationViewSet, basename='register')
 
 urlpatterns = [
     path('', include(router.urls)),
