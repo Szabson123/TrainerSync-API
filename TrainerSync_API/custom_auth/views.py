@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from users.models import CustomUser
-from .serializers import UserRegistrationSerializer
+from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 @extend_schema_view(create=extend_schema(exclude=True))
@@ -17,3 +18,7 @@ class RegistrationViewSet(viewsets.ViewSet):
             user = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
