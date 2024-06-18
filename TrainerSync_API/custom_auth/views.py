@@ -1,11 +1,16 @@
 from django.shortcuts import render
-from rest_framework import viewsets, status, permissions
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from users.models import CustomUser
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
+
+from rest_framework import viewsets, status, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import action
+
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 @extend_schema_view(create=extend_schema(exclude=True))
@@ -22,3 +27,16 @@ class RegistrationViewSet(viewsets.ViewSet):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data['refresh_token']
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
