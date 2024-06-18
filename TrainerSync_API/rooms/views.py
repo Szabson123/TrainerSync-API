@@ -27,11 +27,9 @@ class RoomViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
     
-    @action(detail=True, methods=['POST'])
-    def upgrade_to_trainer(self, request, pk=None):
-        room = self.get_object()
-        user_id = request.data.get('user_id')
-        user = get_object_or_404(CustomUser, pk=user_id)
+    def assign_trainer(self, request, room_id=None, trainer_id=None):
+        room = get_object_or_404(Room, pk=room_id)
+        user = get_object_or_404(CustomUser, pk=trainer_id)
         
         if user in room.users.all():
             room.users.remove(user)
@@ -41,11 +39,9 @@ class RoomViewSet(viewsets.ModelViewSet):
         
         return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=True, methods=['POST'])
-    def remove_trainer(self, request, pk=None):
-        room = self.get_object()
-        user_id = request.data.get('user_id')
-        user = get_object_or_404(CustomUser, pk=user_id)
+    def remove_trainer(self, request, room_id=None, trainer_id=None):
+        room = get_object_or_404(Room, pk=room_id)
+        user = get_object_or_404(CustomUser, pk=trainer_id)
         
         if room.owner != request.user:
             return Response('You are not the owner of this room', status=status.HTTP_403_FORBIDDEN)
@@ -57,6 +53,7 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response({'status': 'Trainer removed'}, status=status.HTTP_200_OK)
         
         return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+
     
     @action(detail=True, methods=['GET'])
     def users_trainers_subusers_list(self, request, pk=None):
@@ -86,7 +83,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         return Response({'code': serializer.data}, status=status.HTTP_201_CREATED)
     
     @action(detail=False, methods=['POST'])
-    def use_code_to_join_room(self, request):
+    def join(self, request):
         code = request.data.get('code')
         user = self.request.user
         if not code:

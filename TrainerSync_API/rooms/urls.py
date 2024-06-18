@@ -12,4 +12,6 @@ router.register('statute_acceptances', StatueAcceprtanceViewset)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('<int:room_id>/assign-trainer/<int:trainer_id>/', RoomViewSet.as_view({'post': 'assign_trainer'}), name='assign-trainer'),
+    path('<int:room_id>/remove-trainer/<int:trainer_id>/', RoomViewSet.as_view({'post': 'remove_trainer'}), name='remove-trainer'),
 ]
