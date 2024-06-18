@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import CustomUser, SubUser
 from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class SubUserSerializer(serializers.ModelSerializer):
     parent_name = serializers.CharField(source='parent.first_name', read_only=True)
@@ -36,13 +38,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         }
 
     def get_token(self, obj):
-        token, created = Token.objects.get_or_create(user=obj)
-        return token.key
+        refresh = RefreshToken.for_user(obj)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = CustomUser(**validated_data)
         user.set_password(password)
         user.save()
-        Token.objects.create(user=user)  # Create token for the user
         return user

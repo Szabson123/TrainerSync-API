@@ -10,4 +10,5 @@ router.register('(?P<parent_pk>\d+)/subusers', SubUserViewSet, basename='subuser
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', UserViewSet.as_view({'post': 'register'}), name='user-register'),
 ]

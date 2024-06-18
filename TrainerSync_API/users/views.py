@@ -7,6 +7,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from django.contrib.auth import get_user_model
+
+
+CustomUser = get_user_model()
 
 
 @extend_schema_view(create=extend_schema(exclude=True))
