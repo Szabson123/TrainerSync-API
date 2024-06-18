@@ -53,6 +53,21 @@ class RoomViewSet(viewsets.ModelViewSet):
             return Response({'status': 'Trainer removed'}, status=status.HTTP_200_OK)
         
         return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def accepet_user(self, request, room_id=None, unaccepted_id=None):
+        room = get_object_or_404(Room, pk=room_id)
+        user = get_object_or_404(CustomUser, pk=unaccepted_id)
+        
+        if room.owner != request.user:
+            return Response('You are not the owner of this room', status=status.HTTP_403_FORBIDDEN)
+        
+        if user in room.unaccepted_users.all():
+            room.unaccepted_users.remove(user)
+            room.users.add(user)
+            room.save()
+            return Response({'status': 'User accepted'}, status=status.HTTP_200_OK)
+        
+        return Response({'status': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
 
     
     @action(detail=True, methods=['GET'])
@@ -92,10 +107,10 @@ class RoomViewSet(viewsets.ModelViewSet):
         invitation_code = get_object_or_404(InvitationCode, code=code)
         room = invitation_code.room
 
-        if user in room.users.all() or user in room.trainers.all():
+        if user in room.users.all() or user in room.trainers.all() or user in room.unaccepted_users.all():
             return Response({'error': 'User is already in the room'}, status=status.HTTP_400_BAD_REQUEST)
         
-        room.users.add(user)
+        room.unaccepted_users.add(user)
         room.save()
 
         return Response({'status': 'User added to the room'}, status=status.HTTP_200_OK)

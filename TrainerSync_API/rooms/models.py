@@ -10,9 +10,10 @@ class Room(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
-    trainers = models.ManyToManyField(CustomUser, related_name='trainer_in_room')
-    users = models.ManyToManyField(CustomUser, related_name='users_in_room')
-    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_room')
+    trainers = models.ManyToManyField(CustomUser, related_name='trainer_in_room', null=True, blank=True)
+    users = models.ManyToManyField(CustomUser, related_name='users_in_room', null=True, blank=True)
+    unaccepted_users = models.ManyToManyField(CustomUser, related_name='unaccepted_users', null=True, blank=True)
+    subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_room', null=True, blank=True)
     
     def generate_code(self):
         code = uuid.uuid4().hex[:6].upper()
