@@ -153,16 +153,9 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         return Response({'status': 'Attendance marked and balance updated'}, status=status.HTTP_200_OK)
 
         
-class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
-    queryset = BalanceForActivityClass.objects.none()
-    serializer_class = BalanceForActivityClassSerializer
+class BalanceForActivityClassViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
-    
-    def get_queryset(self):
-        room_id = self.kwargs['room_pk']
-        return BalanceForActivityClass.objects.filter(room_id=room_id)
-    
-    
+       
     @extend_schema(
         description="user_id taking from the url"
     )
