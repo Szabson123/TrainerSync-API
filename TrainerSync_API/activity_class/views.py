@@ -40,7 +40,7 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         return instance
     
     @action(detail=True, methods=['GET'])
-    def payment_users_list(self, request, pk=None):
+    def payment_present_users_list(self, request, pk=None, **kwargs):
         activity_class = self.get_object()
         balance_users = BalanceForActivityClass.objects.filter(activity_class=activity_class)
         
@@ -70,7 +70,7 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
-    def history_of_user_payments(self, request, pk=None):
+    def history_of_user_payments(self, request, pk=None, **kwargs):
         user_id = request.data.get('user_id')
 
         if not user_id:
@@ -88,7 +88,6 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
                 'amount_due': balance.amount_due,
                 'amount_paid': balance.amount_paid,
                 'date': balance.date,
-                'type': 'User',
                 'name': balance.user.get_full_name() if balance.user else None,
             }
             result.append(user_data)
