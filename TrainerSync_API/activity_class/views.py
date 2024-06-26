@@ -18,9 +18,10 @@ class IsRoomOwner(permissions.BasePermission):
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
+    
     queryset = ActivityClass.objects.none()
     serializer_class = ActivityClassSerializer
-    permission_classes = [permissions.IsAuthenticated, IsRoomOwner]
+    permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
@@ -35,17 +36,17 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         room_id = self.kwargs.get('room_pk')
         room = get_object_or_404(Room, pk=room_id)
         
-        if room.owner != self.request.user:
-            raise PermissionDenied("You do not have permission to add activity classes to this room.")
+        # if room.owner != self.request.user:
+        #     raise PermissionDenied("You do not have permission to add activity classes to this room.")
         
         instance = serializer.save(room=room)
-        instance.create_balances()
+        instance.create_attendance()
         return instance
 
     @action(detail=True, methods=['POST'])
-    def create_balances(self, request, pk=None):
+    def create_attendance(self, request, pk=None):
         activity_class = self.get_object()
-        activity_class.create_balances()
+        activity_class.create_attendance()
         return Response(status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['GET'])
@@ -150,3 +151,12 @@ class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
         return BalanceForActivityClass.objects.filter(room_id=room_id)
+    
+
+class AttendanceForActivityClassViewSet(viewsets.ModelViewSet):
+    queryset = Attendance.objects.none()
+    serializer_class = AttendanceForActivityClassSerializer
+    
+    def get_queryset(self):
+        room_id = self.kwargs['room_pk']
+        return AttendanceForActivityClassViewSet.objects.filter(room_id=room_id)

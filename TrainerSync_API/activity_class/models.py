@@ -28,9 +28,9 @@ class ActivityClass(models.Model):
                 self.time = self.end_date - self.start_date
             self.clean()
             super().save(*args, **kwargs)
-            self.create_balances()
+            self.create_attendance()
 
-    def create_balances(self):
+    def create_attendance(self):
         users_in_activity = set(self.users.all())
         subusers_in_activity = set(self.subusers.all())
 
@@ -39,23 +39,29 @@ class ActivityClass(models.Model):
             subusers_in_activity.update(group.subusers.all())
 
         for user in users_in_activity:
-            BalanceForActivityClass.objects.get_or_create(
+            Attendance.objects.get_or_create(
                 user=user,
                 room=self.room,
                 activity_class=self,
-                defaults={'amount_due': self.cost}
             )
 
         for subuser in subusers_in_activity:
-            BalanceForActivityClass.objects.get_or_create(
+            Attendance.objects.get_or_create(
                 subuser=subuser,
                 room=self.room,
                 activity_class=self,
-                defaults={'amount_due': self.cost}
             )
 
     def __str__(self):
         return self.name
+    
+
+class Attendance(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_attendance', null=True, blank=True)
+    subuser = models.ForeignKey(SubUser, on_delete=models.CASCADE, related_name='subuser_attendance', null=True, blank=True)
+    activity_class = models.ForeignKey(ActivityClass, on_delete=models.CASCADE, related_name='user_attendance_activity')
+    present = models.BooleanField(default=False)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_in_attendance')
 
 
 class BalanceForActivityClass(models.Model):

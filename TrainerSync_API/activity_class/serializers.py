@@ -32,7 +32,6 @@ class ActivityClassSerializer(serializers.ModelSerializer):
     def get_groups_name(self, obj):
         return [group.name for group in obj.groups.all()]
     
-    
     def create(self, validated_data):
         users_data = validated_data.pop('users', [])
         subusers_data = validated_data.pop('subusers', [])
@@ -47,10 +46,9 @@ class ActivityClassSerializer(serializers.ModelSerializer):
             activity_class.groups.set(groups_data)
         
         activity_class.save()
-        activity_class.create_balances()
+        activity_class.create_attendance()
         
         return activity_class
-
 
 
 class BalanceForActivityClassSerializer(serializers.ModelSerializer):
@@ -70,4 +68,18 @@ class BalanceForActivityClassSerializer(serializers.ModelSerializer):
         return None
 
         
+class AttendanceForActivityClassSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    room_name = serializers.CharField(source='room.name', read_only=True)
+    activity_class_name = serializers.CharField(source='activity_class.name', read_only=True)
     
+    class Meta:
+        model = BalanceForActivityClass
+        fields = ['user_name', 'room_name', 'activity_class', 'activity_class_name']
+    
+    def get_user_name(self, obj):
+        if obj.user is not None:
+            return obj.user.get_full_name()
+        elif obj.subuser is not None:
+            return f'{obj.subuser.name} rodzic {obj.subuser.parent.get_full_name()}'
+        return None
