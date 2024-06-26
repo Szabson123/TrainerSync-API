@@ -74,8 +74,11 @@ class AttendanceForActivityClassSerializer(serializers.ModelSerializer):
     activity_class_name = serializers.CharField(source='activity_class.name', read_only=True)
     
     class Meta:
-        model = BalanceForActivityClass
-        fields = ['user_name', 'room_name', 'activity_class', 'activity_class_name']
+        model = Attendance
+        fields = ['user_name', 'room_name', 'activity_class', 'activity_class_name', 'present']
+        extra_kwargs = {
+                'activity_class': {'write_only': True}
+        }
     
     def get_user_name(self, obj):
         if obj.user is not None:

@@ -6,7 +6,7 @@ from .views import *
 router = DefaultRouter()
 router.register('(?P<room_pk>\d+)/activities', ActivityClassViewSet, basename='activityclass')
 router.register('(?P<room_pk>\d+)/balance_for_activity', BalanceForActivityClassViewSet, basename='balanceforactivityclass')
-router.register('(?P<room_pk>\d+)/attendance', AttendanceForActivityClassViewSet, basename='attendanceforactivityclass')
+router.register('(?P<room_pk>\d+)/attendance/(?P<activity_class_pk>\d+)', AttendanceForActivityClassViewSet, basename='attendanceforactivityclass')
 
 urlpatterns = [
     path('', include(router.urls)),
