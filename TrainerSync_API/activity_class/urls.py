@@ -4,10 +4,9 @@ from rest_framework.routers import DefaultRouter
 from .views import *
 
 router = DefaultRouter()
-
-router.register('(?P<room_pk>\d+)/activities', ActivityClassViewSet),
-router.register('(?P<room_pk>\d+)/balance_for_activity', BalanceForActivityClassViewSet),
-router.register('(?P<room_pk>\d+)/attendance', AttendanceForActivityClassViewSet),
+router.register('(?P<room_pk>\d+)/activities', ActivityClassViewSet, basename='activityclass')
+router.register('(?P<room_pk>\d+)/balance_for_activity', BalanceForActivityClassViewSet, basename='balanceforactivityclass')
+router.register('(?P<room_pk>\d+)/attendance', AttendanceForActivityClassViewSet, basename='attendanceforactivityclass')
 
 urlpatterns = [
     path('', include(router.urls)),

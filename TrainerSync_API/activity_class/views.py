@@ -18,7 +18,6 @@ class IsRoomOwner(permissions.BasePermission):
 
 
 class ActivityClassViewSet(viewsets.ModelViewSet):
-    
     queryset = ActivityClass.objects.none()
     serializer_class = ActivityClassSerializer
     permission_classes = [permissions.AllowAny]
@@ -36,18 +35,9 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         room_id = self.kwargs.get('room_pk')
         room = get_object_or_404(Room, pk=room_id)
         
-        # if room.owner != self.request.user:
-        #     raise PermissionDenied("You do not have permission to add activity classes to this room.")
-        
         instance = serializer.save(room=room)
         instance.create_attendance()
         return instance
-
-    @action(detail=True, methods=['POST'])
-    def create_attendance(self, request, pk=None):
-        activity_class = self.get_object()
-        activity_class.create_attendance()
-        return Response(status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['GET'])
     def payment_users_list(self, request, pk=None):
@@ -117,16 +107,14 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
 
         return Response(result, status=status.HTTP_200_OK)
         
-    
     @action(detail=True, methods=['POST'])
-    def payment_accepted_by_trainer_manager(self, request, pk=None):
+    def acceptance_payment_outside_system(self, request, pk=None, **kwargs):
         activity_class = self.get_object()
         user_id = request.data.get('user_id')
         
         if not user_id:
             return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Find the balance for the given user and activity class
         balance_user = BalanceForActivityClass.objects.filter(
             activity_class=activity_class,
             user_id=user_id,
@@ -141,9 +129,39 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         balance_user.save()
 
         return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=["POST"])
+    def check_attendance(self, request, pk=None, **kwargs):
+        activity_class = self.get_object()
+        user_id = request.data.get('user_id')
 
-       
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        attendance, created = Attendance.objects.get_or_create(
+            user_id=user_id,
+            activity_class=activity_class,
+            room=activity_class.room,
+            defaults={'present': True}
+        )
+        if not created:
+            attendance.present = True
+            attendance.save()
+        
+        balance, created = BalanceForActivityClass.objects.get_or_create(
+            user_id=user_id,
+            activity_class=activity_class,
+            room=activity_class.room,
+            defaults={'amount_due': activity_class.cost, 'amount_paid': 0, 'paid': False}
+        )
+        if not created:
+            balance.amount_due += activity_class.cost
+            balance.save()
+            
+        
+        return Response({'status': 'Attendance marked and balance updated'}, status=status.HTTP_200_OK)
 
+        
 class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
     queryset = BalanceForActivityClass.objects.none()
     serializer_class = BalanceForActivityClassSerializer
@@ -156,6 +174,7 @@ class BalanceForActivityClassViewSet(viewsets.ModelViewSet):
 class AttendanceForActivityClassViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.none()
     serializer_class = AttendanceForActivityClassSerializer
+    permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         room_id = self.kwargs['room_pk']
