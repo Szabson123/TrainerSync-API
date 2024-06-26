@@ -131,7 +131,7 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
         return Response({'status': 'User Payment Accepted'}, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=["POST"])
-    def check_attendance(self, request, pk=None, **kwargs):
+    def check_attendance_set_true(self, request, pk=None, **kwargs):
         activity_class = self.get_object()
         user_id = request.data.get('user_id')
 
@@ -155,8 +155,36 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
             defaults={'amount_due': activity_class.cost, 'amount_paid': 0, 'paid': False}
         )
         if not created:
-            balance.amount_due += activity_class.cost
+            balance.amount_due = activity_class.cost
             balance.save()
+            
+        
+        return Response({'status': 'Attendance marked and balance updated'}, status=status.HTTP_200_OK)
+    
+    
+    @action(detail=True, methods=["POST"])
+    def check_attendance_set_false(self, request, pk=None, **kwargs):
+        activity_class = self.get_object()
+        user_id = request.data.get('user_id')
+
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        attendance, created = Attendance.objects.get_or_create(
+            user_id=user_id,
+            activity_class=activity_class,
+            room=activity_class.room,
+            defaults={'present': False}
+        )
+        if not created:
+            attendance.present = False
+            attendance.save()
+        
+        BalanceForActivityClass.objects.filter(
+            user_id=user_id,
+            activity_class=activity_class,
+            room=activity_class.room
+        ).delete()
             
         
         return Response({'status': 'Attendance marked and balance updated'}, status=status.HTTP_200_OK)

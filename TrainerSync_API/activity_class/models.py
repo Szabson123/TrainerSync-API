@@ -63,6 +63,12 @@ class Attendance(models.Model):
     present = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_in_attendance')
 
+    def get_name(self):
+        return self.activity_class.name if self.activity_class else "No Activity Class"
+
+    def __str__(self):
+        return f'{self.user or self.subuser} -- {self.get_name()}'
+    
 
 class BalanceForActivityClass(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='balance_user', null=True, blank=True)
