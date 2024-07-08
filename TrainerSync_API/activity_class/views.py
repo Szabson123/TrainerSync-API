@@ -151,7 +151,25 @@ class ActivityClassViewSet(viewsets.ModelViewSet):
             
         
         return Response({'status': 'Attendance marked and balance updated'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=["POST"], permission_classes=[permissions.IsAuthenticated])
+    def set_presence(self, request, pk=None):
+        activity_class = self.get_object()
+        user = request.user
 
+        attendance, created = Attendance.objects.get_or_create(
+            user=user,
+            activity_class=activity_class,
+            defaults={'present': True, 'room': activity_class.room}  
+        )
+
+        if not created:
+            attendance.present = not attendance.present
+            attendance.save()
+
+        serializer = AttendanceForActivityClassSerializer(attendance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
         
 class BalanceForActivityClassViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
