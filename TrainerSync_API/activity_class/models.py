@@ -62,6 +62,7 @@ class Attendance(models.Model):
     activity_class = models.ForeignKey(ActivityClass, on_delete=models.CASCADE, related_name='user_attendance_activity')
     present = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='room_in_attendance')
+    confirmation_present = models.BooleanField(default=False)
 
     def get_name(self):
         return self.activity_class.name if self.activity_class else "No Activity Class"
