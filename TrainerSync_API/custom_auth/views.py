@@ -2,7 +2,7 @@ from django.shortcuts import render
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from users.models import CustomUser
-from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
+from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.views import APIView
@@ -11,7 +11,24 @@ from rest_framework.decorators import action
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    @extend_schema(
+        request=ChangePasswordSerializer,
+        responses={
+            200: 'Password change successfully',
+            400: 'Bad request'
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.update(request.user, serializer.validated_data)
+            return Response({"detail": "Password changed"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @extend_schema_view(create=extend_schema(exclude=True))
 class RegistrationViewSet(viewsets.ViewSet):
@@ -27,9 +44,7 @@ class RegistrationViewSet(viewsets.ViewSet):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-    
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
