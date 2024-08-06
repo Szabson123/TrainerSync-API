@@ -15,7 +15,7 @@ class ActivityClassSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActivityClass
-        fields = ['id', 'name', 'groups', 'groups_name', 'unique_users', 'users', 'subusers', 'cost', 'start_date', 'end_date']
+        fields = ['id', 'name', 'groups', 'groups_name', 'unique_users', 'users', 'subusers', 'cost', 'start_date', 'time', 'localization', 'type']
 
     @extend_schema_field(Dict[str, List[Dict[str, str]]])
     def get_unique_users(self, obj) -> Dict[str, List[Dict[str, str]]]:
