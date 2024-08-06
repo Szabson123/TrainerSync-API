@@ -10,7 +10,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'phone_number', 'first_name', 'last_name', 'email', 'password', 'token']
+        fields = ['id', 'phone_number', 'first_name', 'last_name', 'email', 'password', 'token']
         extra_kwargs = {
             'password': {'write_only': True, 'required': True},
             'email': {'required': True},
@@ -38,5 +38,5 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username'] = user.username
+        token['email'] = user.email
         return token

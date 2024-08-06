@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q
 from rest_framework.exceptions import PermissionDenied
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_field, extend_schema_view
+from typing import Optional
 
 
 class IsRoomOwner(permissions.BasePermission):
@@ -213,6 +214,24 @@ class BalanceForActivityClassViewSet(viewsets.ViewSet):
         return Response(result, status=status.HTTP_200_OK)
 
     
+@extend_schema_view(
+    list=extend_schema(
+        operation_id="activity_class_attendance_list",
+        parameters=[
+            OpenApiParameter(name='room_pk', description='Primary key of the room', required=True, type=int),
+            OpenApiParameter(name='activity_class_pk', description='Primary key of the activity class', required=True, type=int),
+        ],
+    ),
+    retrieve=extend_schema(
+        operation_id="activity_class_attendance_retrieve",
+        parameters=[
+            OpenApiParameter(name='room_pk', description='Primary key of the room', required=True, type=int),
+            OpenApiParameter(name='activity_class_pk', description='Primary key of the activity class', required=True, type=int),
+            OpenApiParameter(name='pk', description='Primary key of the attendance', required=True, type=int),
+        ],
+    )
+)
+
 
 class AttendanceForActivityClassViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
