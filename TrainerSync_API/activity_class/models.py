@@ -16,10 +16,6 @@ class ActivityClass(models.Model):
     time = models.IntegerField(null=True)
     localization = models.CharField(max_length=255, blank=True, null=True,)
     type = models.CharField(blank=True, null=True, max_length=255)
-    
-    def clean(self):
-        if self.start_date and self.time and self.start_date + self.time < self.start_date:
-            raise ValidationError(_('Calculated end date from start date and time cannot be earlier than start date'))
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
