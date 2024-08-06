@@ -19,7 +19,6 @@ class ActivityClass(models.Model):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
-            self.clean()
             super().save(*args, **kwargs)
             self.create_attendance()
 
