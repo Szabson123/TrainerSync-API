@@ -29,12 +29,38 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'refresh': {
+                        'type': 'string',
+                        'description': 'Refresh token',
+                    },
+                },
+                'required': ['refresh'],
+            }
+        },
+        responses={
+            205: OpenApiExample(
+                'Token successfully blacklisted',
+                value={},
+            ),
+            400: OpenApiExample(
+                'Bad request',
+                value={'detail': 'Bad request'},
+            ),
+        }
+    )
     def post(self, request):
         try:
-            refresh_token = request.data['refresh_token']
+            refresh_token = request.data['refresh']
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)
