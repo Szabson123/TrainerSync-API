@@ -13,7 +13,7 @@ class ActivityClass(models.Model):
     subusers = models.ManyToManyField(SubUser, related_name='sub_users_in_activity_group', blank=True)
     cost = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     start_date = models.DateTimeField(null=True)
-    time = models.DurationField(null=True)
+    time = models.IntegerField(null=True)
     localization = models.CharField(max_length=255, blank=True, null=True,)
     type = models.CharField(blank=True, null=True, max_length=255)
     
