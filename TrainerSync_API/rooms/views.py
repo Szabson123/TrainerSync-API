@@ -25,7 +25,10 @@ class RoomViewSet(viewsets.ModelViewSet):
         return RoomSerializer
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        instance = serializer.save(owner=self.request.user)
+        code = instance.generate_code()
+        instance.invitation_code = code
+        instance.save()
     
     def assign_trainer(self, request, room_id=None, trainer_id=None):
         room = get_object_or_404(Room, pk=room_id)
@@ -90,11 +93,16 @@ class RoomViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST'])
     def generate_code(self, request, pk=None):
         room = self.get_object()
+        
+        if room.owner != request.user:
+            return Response({'error': 'You are not authorized to generate an invitation code for this room.'}, status=status.HTTP_403_FORBIDDEN)
+        
         if hasattr(room, 'invitation_code'):
             room.invitation_code.delete()
         new_code = room.generate_code()
         invitation_code = InvitationCode.objects.create(room=room, code=new_code)
         serializer = InvitationCodeSerializer(invitation_code)
+        
         return Response({'code': serializer.data}, status=status.HTTP_201_CREATED)
     
     @action(detail=False, methods=['POST'])
