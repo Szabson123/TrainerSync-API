@@ -109,6 +109,10 @@ class RoomViewSet(viewsets.ModelViewSet):
     def join(self, request):
         code = request.data.get('code')
         user = self.request.user
+
+        if user == room.owner:
+            return Response({'error': 'You are owner XDD'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not code:
             return Response({'error': 'Code is required'}, status=status.HTTP_400_BAD_REQUEST)
         
