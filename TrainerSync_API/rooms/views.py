@@ -110,14 +110,14 @@ class RoomViewSet(viewsets.ModelViewSet):
         code = request.data.get('code')
         user = self.request.user
 
-        if user == room.owner:
-            return Response({'error': 'You are owner XDD'}, status=status.HTTP_400_BAD_REQUEST)
-
         if not code:
             return Response({'error': 'Code is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         invitation_code = get_object_or_404(InvitationCode, code=code)
         room = invitation_code.room
+
+        if user == room.owner:
+            return Response({'error': 'You are owner XDD'}, status=status.HTTP_400_BAD_REQUEST)
 
         if user in room.users.all() or user in room.trainers.all() or user in room.unaccepted_users.all():
             return Response({'error': 'User is already in the room'}, status=status.HTTP_400_BAD_REQUEST)
