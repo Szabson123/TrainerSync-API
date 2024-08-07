@@ -73,20 +73,23 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     
     @action(detail=True, methods=['GET'])
-    def users_trainers_subusers_list(self, request, pk=None):
+    def users_trainers_subusers_list_unaccepted_users(self, request, pk=None):
         room = self.get_object()
         users = room.users.all()
         subusers = room.subusers.all()
         trainers = room.trainers.all()
+        unaccepted_users_queryset = room.unaccepted_users.all()
         
         users_serializer = SimpleUserSerializer(users, many=True)
         subusers_serializer = SimpleSubUserSerializer(subusers, many=True)
         trainers_serializer = SimpleUserSerializer(trainers, many=True)
+        unaccepted_users_serializer = SimpleUserSerializer(unaccepted_users_queryset, many=True)
         
         return Response({
             'trainers': trainers_serializer.data,
             'users': users_serializer.data,
-            'subusers': subusers_serializer.data
+            'subusers': subusers_serializer.data,
+            'unaccepted_users': unaccepted_users_serializer.data 
         }, status=status.HTTP_200_OK)
     
 
