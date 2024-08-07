@@ -25,10 +25,9 @@ class RoomViewSet(viewsets.ModelViewSet):
         return RoomSerializer
 
     def perform_create(self, serializer):
-        instance = serializer.save(owner=self.request.user)
-        code = instance.generate_code()
-        instance.invitation_code = code
-        instance.save()
+        room_instance = serializer.save(owner=self.request.user)
+        code = room_instance.generate_code()
+        InvitationCode.objects.create(room=room_instance, code=code)
     
     def assign_trainer(self, request, room_id=None, trainer_id=None):
         room = get_object_or_404(Room, pk=room_id)
@@ -89,7 +88,8 @@ class RoomViewSet(viewsets.ModelViewSet):
             'users': users_serializer.data,
             'subusers': subusers_serializer.data
         }, status=status.HTTP_200_OK)
-        
+    
+
     @action(detail=True, methods=['POST'])
     def generate_code(self, request, pk=None):
         room = self.get_object()
