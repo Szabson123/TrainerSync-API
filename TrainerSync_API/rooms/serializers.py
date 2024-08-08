@@ -3,6 +3,18 @@ from .models import *
 from users.serializers import *
 
 
+def format_errors(serializer_errors):
+    errors = []
+    for field, messages in serializer_errors.items():
+        if isinstance(messages, list):
+            errors.append(f"{messages[0]}")
+        else:
+            errors.append(f"{messages}")
+
+    error_message = " ".join(errors)
+    return {'error': error_message}
+
+
 class SimpleUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser

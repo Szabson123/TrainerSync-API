@@ -5,6 +5,18 @@ from django.contrib.auth.password_validation import validate_password
 from users.models import CustomUser
 
 
+def format_errors(serializer_errors):
+    errors = []
+    for field, messages in serializer_errors.items():
+        if isinstance(messages, list):
+            errors.append(f"{messages[0]}")
+        else:
+            errors.append(f"{messages}")
+
+    error_message = " ".join(errors)
+    return {'error': error_message}
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -23,7 +35,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
-
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

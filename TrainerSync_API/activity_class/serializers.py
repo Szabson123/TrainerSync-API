@@ -6,6 +6,19 @@ from rooms.serializers import *
 from drf_spectacular.utils import extend_schema_field
 from typing import List, Dict, Any
 
+
+def format_errors(serializer_errors):
+    errors = []
+    for field, messages in serializer_errors.items():
+        if isinstance(messages, list):
+            errors.append(f"{messages[0]}")
+        else:
+            errors.append(f"{messages}")
+
+    error_message = " ".join(errors)
+    return {'error': error_message}
+
+
 class ActivityClassSerializer(serializers.ModelSerializer):
     unique_users = serializers.SerializerMethodField()
     groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True, required=False, write_only=True)

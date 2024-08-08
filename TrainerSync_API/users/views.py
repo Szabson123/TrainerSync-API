@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status, permissions
 from .models import CustomUser, SubUser
-from .serializers import UserSerializer, SubUserSerializer
+from .serializers import UserSerializer, SubUserSerializer, format_errors
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
@@ -30,4 +30,6 @@ class SubUserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        formatted_errors = format_errors(serializer.errors)
+        return Response(formatted_errors, status=status.HTTP_400_BAD_REQUEST)

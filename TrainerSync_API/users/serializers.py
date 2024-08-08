@@ -1,6 +1,19 @@
 from rest_framework import serializers
 from .models import CustomUser, SubUser
 
+
+def format_errors(serializer_errors):
+    errors = []
+    for field, messages in serializer_errors.items():
+        if isinstance(messages, list):
+            errors.append(f"{messages[0]}")
+        else:
+            errors.append(f"{messages}")
+
+    error_message = " ".join(errors)
+    return {'error': error_message}
+
+
 class SubUserSerializer(serializers.ModelSerializer):
     parent_name = serializers.CharField(source='parent.first_name', read_only=True)
 

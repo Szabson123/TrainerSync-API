@@ -2,7 +2,7 @@ from django.shortcuts import render
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from users.models import CustomUser
-from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer
+from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, format_errors
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.views import APIView
@@ -37,9 +37,11 @@ class RegistrationViewSet(viewsets.ViewSet):
     def register(self, request, *args, **kwargs):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response({'error': 'user with this email already exist'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            formatted_errors = format_errors(serializer.errors)
+            return Response(formatted_errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class CustomTokenObtainPairView(TokenObtainPairView):
