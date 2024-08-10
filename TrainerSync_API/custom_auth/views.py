@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
 
+
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     @extend_schema(
@@ -29,6 +30,7 @@ class ChangePasswordView(APIView):
             serializer.update(request.user, serializer.validated_data)
             return Response({"detail": "Password changed"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @extend_schema_view(create=extend_schema(exclude=True))
 class RegistrationViewSet(viewsets.ViewSet):
