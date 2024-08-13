@@ -131,11 +131,19 @@ class RoomViewSet(viewsets.ModelViewSet):
         return Response({'status': 'User added to the room'}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
-    def get_my_rooms(self, request):
+    def get_owner_rooms(self, request):
         user = request.user
         rooms = Room.objects.filter(owner=user)
         serializer = RoomSerializer(rooms, many=True)
         return Response({'rooms': serializer.data}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['GET'])
+    def get_my_rooms(self, request):
+        user = request.user
+        rooms = Room.objects.filter(users=user)
+        serializer = RoomSerializer(rooms, many=True)
+        return Response({'rooms': serializer.data}, status=status.HTTP_200_OK)
+    
     
     
 class GroupViewSet(viewsets.ModelViewSet):
