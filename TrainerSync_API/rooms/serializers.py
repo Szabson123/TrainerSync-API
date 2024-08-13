@@ -45,10 +45,14 @@ class RoomSerializer(serializers.ModelSerializer):
     trainers = SimpleUserSerializer(many=True, read_only=True)
     users = SimpleUserSerializer(many=True, read_only=True)
     subusers = SimpleUserSerializer(many=True, read_only=True)
+    user_count = serializers.SerializerMethodField()
     
+    def get_user_count(self, obj):
+        return obj.users.count()
+
     class Meta:
         model = Room
-        fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room', 'trainers', 'users', 'subusers', 'code']
+        fields = ['id', 'name', 'owner', 'is_active', 'created_date', 'update_date', 'groups_to_room', 'trainers', 'users', 'subusers', 'code', 'user_count']
         
         
 class SimpleUserSerializer(serializers.ModelSerializer):
