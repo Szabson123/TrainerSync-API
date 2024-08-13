@@ -3,6 +3,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
 from users.models import CustomUser
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.conf import settings
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode
 
 
 def format_errors(serializer_errors):
@@ -30,11 +36,27 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        user = CustomUser(**validated_data)
-        user.set_password(password)
+        password = validated_data.pop('password', None) 
+        email = validated_data.pop('email', None)  
+        
+        user = CustomUser.objects.create_user(email=email, password=password, **validated_data)
+        user.is_active = False
         user.save()
+
+        token_generator = PasswordResetTokenGenerator()
+        token = token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        activation_link = settings.DOMAIN_NAME + reverse('activate_user', args=[uid, token])
+
+        send_mail(
+            'Potwierdzenie rejestracji',
+            f'Kliknij w link, aby aktywować swoje konto: {activation_link}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
         return user
+
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

@@ -5,7 +5,7 @@ from django.contrib.auth.models import UserManager as BaseUserManager
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def _create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
@@ -14,7 +14,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -24,23 +24,21 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(email, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)
 
 
 class CustomUser(AbstractUser):
-    username = models.CharField(max_length=150, unique=False, null=True, blank=True)
+    username = None  
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    email = models.EmailField(unique=True)
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []  
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
-    email = models.EmailField(unique=True)  
-    
     def __str__(self):
         return self.email
-
 
     
 class SubUser(models.Model):
@@ -49,6 +47,7 @@ class SubUser(models.Model):
     last_name = models.CharField(max_length=20)
     email = models.EmailField()
     number = models.CharField(max_length=15)
+    is_active = models.BooleanField(default=False)
     
     def __str__(self) -> str:
         return f'Opiekun: {self.parent.get_full_name()} dziecko - {self.name} {self.last_name}'

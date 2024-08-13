@@ -7,12 +7,31 @@ from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerial
 from rest_framework import viewsets, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def activate_user(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user is not None and PasswordResetTokenGenerator().check_token(user, token):
+        user.is_active = True
+        user.save()
+        return Response({'message': 'Konto zostało aktywowane.'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Link aktywacyjny jest nieprawidłowy!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):

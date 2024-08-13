@@ -175,3 +175,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'aplikacjatrener@gmail.com'
 EMAIL_HOST_PASSWORD = 'ylow tfbe kkld yxvf' 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+DOMAIN_NAME = 'http://localhost:8000' 
