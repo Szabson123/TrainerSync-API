@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 urlpatterns = [
     # Swagger
@@ -14,5 +17,4 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('rooms/', include('rooms.urls')),
     path('activity_class/', include('activity_class.urls')),
-]
-
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
