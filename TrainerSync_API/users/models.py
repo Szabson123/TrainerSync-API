@@ -31,6 +31,7 @@ class CustomUser(AbstractUser):
     username = None  
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(unique=True)
+    logo_img = models.ImageField(upload_to='logo_user/', null=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -48,6 +49,7 @@ class SubUser(models.Model):
     email = models.EmailField()
     number = models.CharField(max_length=15)
     is_active = models.BooleanField(default=False)
+    logo_img = models.ImageField(upload_to='logo_subuser/', null=True)
     
     def __str__(self) -> str:
         return f'Opiekun: {self.parent.get_full_name()} dziecko - {self.name} {self.last_name}'

@@ -19,7 +19,7 @@ class SubUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubUser
-        fields = ['id', 'parent_name', 'name', 'last_name', 'number', 'email', 'parent']
+        fields = ['id', 'parent_name', 'name', 'last_name', 'number', 'email', 'parent', 'logo_img']
         extra_kwargs = {
             'name': {'required': True},
             'last_name': {'required': True},
@@ -31,4 +31,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'first_name', 'last_name', 'email', 'sub_user', 'phone_number']
+        fields = ['id', 'first_name', 'last_name', 'email', 'sub_user', 'phone_number', 'logo_img']

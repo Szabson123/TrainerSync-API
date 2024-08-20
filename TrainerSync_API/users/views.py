@@ -5,11 +5,11 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-
 @extend_schema_view(create=extend_schema(exclude=True))
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class SubUserViewSet(viewsets.ModelViewSet):
