@@ -7,6 +7,7 @@ class Room(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='owned_rooms')
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
+    color = models.CharField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
